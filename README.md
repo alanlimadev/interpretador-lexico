@@ -6,7 +6,7 @@
 
 ### As variáveis deverão ser formadas por qualquer tipo de palavra e número. Não é permitido o uso de símbolos especiais no nome de uma variável, nem é permitido variáveis muito longas, com mais de 100 caractéres.
 
-### Seu analisador léxico deverá ignorar comentários. Os comentários sempre serão escritos após \\ e até o final da linha.
+### Seu analisador léxico deverá ignorar comentários. Os comentários sempre serão escritos após \ \ e até o final da linha.
 
 ### Uma expressão poderá usar:
 
