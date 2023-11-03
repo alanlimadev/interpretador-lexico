@@ -80,13 +80,67 @@ int lookup(char ch){
         case ')':
             addChar(); // Adiciona o caractere ')' ao lexema.
             nextToken = RIGHT_PAREN; // Define o token como RIGHT_PAREN (parêntese direito).
-            break;                                    
+            break;
+
+		case '-':
+		    addChar(); // Adiciona o caractere '-' ao lexema
+		    getChar(); // Obtém o próximo caractere
+		    if (nextChar != '>') { // Verifica se o próximo caractere não é '>'
+		        printf("ERRO: A sintaxe correta é: ->\n"); // Exibe uma mensagem de erro para a sintaxe incorreta
+		        exit(1); // Encerra o programa com um código de erro
+		    } else {
+		        addChar(); // Adiciona o caractere '>' ao lexema
+		        getChar(); // Obtém o próximo caractere
+		
+		        char nextCharAux = getc(in_fp); // Lê o próximo caractere do arquivo
+		        if (nextCharAux == '>' || nextCharAux == '-') { // Verifica se o próximo caractere é '>' ou '-'
+		            ungetc(nextCharAux, in_fp); // Coloca o caractere de volta no arquivo
+		            printf("ERRO: A sintaxe correta é: ->\n"); // Exibe uma mensagem de erro para a sintaxe incorreta
+		            exit(1); // Encerra o programa com um código de erro
+		        }
+		
+		        nextToken = IMP_OP; // Define o token como IMP_OP (operador de implicação)
+		        break; 
+		    }
+		    nextToken = UNKNOWN; // Se não corresponder ao operador de implicação, define o token como UNKNOWN (desconhecido)
+		    break; 
+		
+		case '<':
+		    addChar(); // Adiciona o caractere '<' ao lexema
+		    getChar(); // Obtém o próximo caractere
+		    if (nextChar != '-') { // Verifica se o próximo caractere não é '-'
+		        printf("ERRO: A sintaxe correta é: <->\n"); // Exibe uma mensagem de erro para a sintaxe incorreta
+		        exit(1); // Encerra o programa com um código de erro
+		    } else {
+		        char nextCharAux = getc(in_fp); // Lê o próximo caractere do arquivo
+		        if (nextCharAux != '>') { // Verifica se o próximo caractere não é '>'
+		            printf("ERRO: A sintaxe correta é: <->\n"); // Exibe uma mensagem de erro para a sintaxe incorreta
+		            exit(1); // Encerra o programa com um código de erro
+		        } else {
+		            addChar(); // Adiciona o caractere '-' ao lexema
+		            ungetc(nextCharAux, in_fp); // Coloca o caractere de volta no arquivo
+		            getChar(); // Obtém o próximo caractere
+		            addChar(); // Adiciona o caractere '>' ao lexema
+		            getChar(); // Obtém o próximo caractere
+		            nextToken = BIIMP_OP; // Define o token como BIIMP_OP (operador de bi-implicação)
+		            break; 
+		        }
+		        ungetc(nextCharAux, in_fp); // Coloca o caractere de volta no arquivo
+		    }
+		    nextToken = UNKNOWN; // Se não corresponder ao operador de bi-implicação, define o token como UNKNOWN (desconhecido)
+		    break;
+                                   
         default:
             addChar(); // Adiciona o caractere desconhecido ao lexema.
             nextToken = EOF; // Define o token como EOF (final do arquivo).
             break;
     }
     return nextToken; // Retorna o token identificado.
+}
+
+void addAndGetNextChar(){
+    addChar();
+    getChar();
 }
 
 //uma função para adicionar nextChar ao vetor lexeme
@@ -117,7 +171,6 @@ void getChar() {
     }
 }
 
-
 //uma função para chamar getChar até que ela retorne um caractere diferente de espaço em branco
 void getNonBlank() {
     // Enquanto o caractere atual (nextChar) for um espaço em branco, continue o loop.
@@ -125,12 +178,11 @@ void getNonBlank() {
         getChar(); // Chama a função getChar() para ler o próximo caractere.
 }
 
-
-
 int lex() {
+	
     lexLen = 0; // Inicializa o comprimento do lexema como 0
     getNonBlank(); // Remove espaços em branco e avança para o próximo caractere não em branco
-
+	
     switch (charClass) {
         // Reconhecer identificadores 
         case LETTER:
@@ -154,12 +206,12 @@ int lex() {
             nextToken = INT_LIT; // Define o tipo do token como INT_LIT (inteiro literal)
             break;
 
-        // Parênteses e operadores
+		// Parênteses e operadores
         case UNKNOWN:
             lookup(nextChar); // Chama a função lookup para identificar o operador ou caractere desconhecido
             getChar(); // Obtém o próximo caractere
             break;
-
+	
         // Fim do arquivo
         case EOF:
             nextToken = EOF; // Define o tipo do token como EOF (fim de arquivo)
@@ -175,7 +227,7 @@ int lex() {
         nextToken = TRUE;
     else if (strcmp(lexeme, "False") == 0)
         nextToken = FALSE;
-
+        
     // Imprime o tipo do próximo token e o lexema correspondente
     printf("Próximo token é: %d, próximo lexema é %s\n", nextToken, lexeme);
 
