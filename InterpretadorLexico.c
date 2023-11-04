@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <stdbool.h>
 #include <locale.h>
 
 // Declarações de variáveis globais
@@ -19,6 +18,7 @@ void addChar(); // Função para adicionar um caractere ao lexema.
 void getChar(); // Função para obter o próximo caractere do arquivo.
 void getNonBlank(); // Função para ignorar espaços em branco.
 int lex(); // Função principal do analisador léxico.
+//void identBool();
 
 int comments(); // Função para identificar comentários.
 
@@ -27,19 +27,20 @@ int comments(); // Função para identificar comentários.
 #define DIGIT 1
 #define UNKNOWN 99
 
+#define FALSE 10 // "False"
+#define TRUE 11 // "True"
+
 // Códigos de tokens
-#define INT_LIT 10
-#define IDENT 11
-#define FALSE 20 // "False"
-#define TRUE 21 // "True"
-#define AND_OP 22 // *
-#define OR_OP 23 // +
-#define IMP_OP 24 // ->
-#define BIIMP_OP 25 // <->
-#define NOT_OP 26 // !
-#define COMMENT 27 // //
-#define LEFT_PAREN 28 // (
-#define RIGHT_PAREN 29 // )
+#define IDENT 20
+
+#define AND_OP 30 // *
+#define OR_OP 31 // +
+#define IMP_OP 32 // ->
+#define BIIMP_OP 33 // <->
+#define NOT_OP 34 // !
+#define COMMENT 35 // //
+#define LEFT_PAREN 36 // (
+#define RIGHT_PAREN 37 // )
 
 //função principal
 int main() { 
@@ -59,7 +60,9 @@ int main() {
         do { 
             lex(); // Chama a função lex repetidamente até que o próximo token seja o final do arquivo (EOF).
         } while (nextToken != EOF); // Continua a análise léxica até encontrar o final do arquivo.
-    } 
+    }
+	
+	return 0; 
 }
 
 //uma função para processar operadores e parênteses e retornar o token
@@ -156,7 +159,9 @@ int lookup(char ch){
                                    
         default:
             addChar(); // Adiciona o caractere desconhecido ao lexema.
-            nextToken = EOF; // Define o token como EOF (final do arquivo).
+            nextToken = UNKNOWN; 
+            printf("ERRO - Caracter não permitido\n");
+            exit(1);
             break;
     }
     return nextToken; // Retorna o token identificado.
@@ -222,17 +227,10 @@ int lex() {
             nextToken = IDENT; // Define o tipo do token como IDENT (identificador)
             break;
 
-        // Reconhecer literais inteiros 
+        // Reconhecer variáveis que começam com números (RESTRIÇÃO)
         case DIGIT:
-            addChar(); // Adiciona o caractere atual ao lexema
-            getChar(); // Obtém o próximo caractere
-            
-            while (charClass == DIGIT) {
-                addChar(); // Continua a construir o lexema enquanto forem dígitos
-                getChar();
-            }
-            
-            nextToken = INT_LIT; // Define o tipo do token como INT_LIT (inteiro literal)
+            printf("ERRO: Não é possível ter uma variável que inícia com número\n"); 
+            exit(1);
             break;
 
 		// Parênteses e operadores
@@ -250,19 +248,59 @@ int lex() {
             lexeme[3] = 0; // Termina o lexema com nulo
             break;
     } // Fim do switch 
-
-    // Verifica se o lexema é "True" ou "False" e atualiza o tipo do token
-    if (strcmp(lexeme, "True") == 0)
-        nextToken = TRUE;
-    else if (strcmp(lexeme, "False") == 0)
-        nextToken = FALSE;
-        
+    
+	int i;         // Declara uma variável inteira 'i' para uso no loop.
+	int isTrue = 1; // Inicializa uma variável booleana 'isTrue' como verdadeira (1).
+	int isFalse = 1; // Inicializa uma variável booleana 'isFalse' como verdadeira (1).
+	
+	// Inicia um loop que percorre os primeiros 4 caracteres do lexema (índices 0 a 3).
+	for (i = 0; i < 4; i++) {
+	    // Compara o caractere atual do lexema com o caractere correspondente na palavra "True".
+	    // Se não corresponder, define 'isTrue' como falso (0).
+	    if (lexeme[i] != "True"[i]) {
+	        isTrue = 0;
+	    }
+	    
+	    // Compara o caractere atual do lexema com o caractere correspondente na palavra "False".
+	    // Se não corresponder, define 'isFalse' como falso (0).
+	    if (lexeme[i] != "False"[i]) {
+	        isFalse = 0;
+	    }
+	}
+	
+	// Verifica se 'isTrue' ainda é verdadeira (ou seja, o lexema corresponde a "True").
+	if (isTrue) {
+	    nextToken = TRUE; // Define 'nextToken' como o token TRUE.
+	} 
+	// Verifica se 'isFalse' ainda é verdadeira (ou seja, o lexema corresponde a "False").
+	else if (isFalse) {
+	    nextToken = FALSE; // Define 'nextToken' como o token FALSE.
+	}
+    
     // Imprime o tipo do próximo token e o lexema correspondente
     printf("Próximo token é: %d, próximo lexema é %s\n", nextToken, lexeme);
 
     return nextToken;
 }
 
+//void identBool(){
+//	int i;
+//	int isTrue = 1;
+//	int isFalse = 1;
+//	for (i = 0; i < 4; i++) {
+//	    if (lexeme[i] != "True"[i]) {
+//	        isTrue = 0;
+//	    }
+//	    if (lexeme[i] != "False"[i]) {
+//	        isFalse = 0;
+//	    }
+//	}
+//	if (isTrue) {
+//	    nextToken = TRUE;
+//	} else if (isFalse) {
+//	    nextToken = FALSE;
+//	}
+//}
 
 int comments() {
 	
