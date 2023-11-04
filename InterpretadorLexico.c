@@ -4,6 +4,14 @@
 #include <string.h>
 #include <locale.h>
 
+/*
+	/****OBSERVAÇÕES
+	
+	-> Para o operador NOT foi usado '!' oa invés de '¬'
+	-> Não é permitido usar número no início de uma variável
+	
+*/
+
 // Declarações de variáveis globais
 int charClass; // Variável para armazenar a classe do caractere atual (LETTER, DIGIT, UNKNOWN).
 char lexeme[100]; // Um buffer para armazenar o lexema.
@@ -18,8 +26,6 @@ void addChar(); // Função para adicionar um caractere ao lexema.
 void getChar(); // Função para obter o próximo caractere do arquivo.
 void getNonBlank(); // Função para ignorar espaços em branco.
 int lex(); // Função principal do analisador léxico.
-//void identBool();
-
 int comments(); // Função para identificar comentários.
 
 // Classes de caracteres
@@ -27,6 +33,7 @@ int comments(); // Função para identificar comentários.
 #define DIGIT 1
 #define UNKNOWN 99
 
+//Booleanos
 #define FALSE 10 // "False"
 #define TRUE 11 // "True"
 
@@ -282,25 +289,6 @@ int lex() {
 
     return nextToken;
 }
-
-//void identBool(){
-//	int i;
-//	int isTrue = 1;
-//	int isFalse = 1;
-//	for (i = 0; i < 4; i++) {
-//	    if (lexeme[i] != "True"[i]) {
-//	        isTrue = 0;
-//	    }
-//	    if (lexeme[i] != "False"[i]) {
-//	        isFalse = 0;
-//	    }
-//	}
-//	if (isTrue) {
-//	    nextToken = TRUE;
-//	} else if (isFalse) {
-//	    nextToken = FALSE;
-//	}
-//}
 
 int comments() {
 	
